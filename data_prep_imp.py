@@ -68,6 +68,7 @@ for ix, x in enumerate(i):
     aer_sim = Aer.get_backend('aer_simulator')
     job = aer_sim.run(circ, shots=10000)
     hist = job.result().get_counts()
+
     try:
       z[len(implications) + 1][ix][iy] = hist['1']/10000
     except KeyError:
@@ -97,6 +98,32 @@ for ix, x in enumerate(i):
       z[len(implications) + 2][ix][iy] = np.max(c_values[f_ac <= y])
     except ValueError:
       z[len(implications) + 2][ix][iy] = 0
+    
+    ### Quantum implication by comparator
+    c_values = np.sin(np.arange(0.0, np.pi, 0.1))
+    f_ac = np.zeros((c_values.size))
+    for ic, c in enumerate(c_values):
+      qbits = QuantumRegister(3)
+      out = ClassicalRegister(1)
+      circ = QuantumCircuit(qbits, out)
+
+      circ.ry(np.pi*x, qbits[0])
+      circ.x(qbits[0])
+      circ.ry(np.pi*c, qbits[1])
+      circ.ccx(qbits[0], qbits[1], qbits[2])
+      circ.measure(qbits[2], out[0])
+
+      aer_sim = Aer.get_backend('aer_simulator')
+      job = aer_sim.run(circ, shots=10000)
+      hist = job.result().get_counts()
+      try:
+        f_ac[ic] = hist['1']/10000
+      except KeyError:
+        f_ac[ic] = 0
+    try:
+      z[len(implications) + 3][ix][iy] = np.max(c_values[f_ac <= y])
+    except ValueError:
+      z[len(implications) + 3][ix][iy] = 0
 
 # Prepare data
 tags = [

@@ -13,7 +13,7 @@ data_a = data.a.unique()
 data_b = data.b.unique()
 X, Y = np.meshgrid(data_a, data_b)
 fig = plt.figure()
-sub = 241
+sub = 111
 axs = []
 values = np.zeros((len(tags), len(data_a), len(data_b)))
 
